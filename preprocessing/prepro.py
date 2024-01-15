@@ -2,7 +2,7 @@ import pandas as pd;
 import matplotlib.pyplot as plt;
 import os;
 import platform;
-import seaborn as sns;
+#import seaborn as sns;
 
 if platform.system() == "Windows":
     path = "preprocessing/"
@@ -13,15 +13,34 @@ else:
 dataset = pd.read_csv(path + "games.csv");
 
 #Show corroleation matrix
-def show_correlation_matrix(df):
-    plt.figure(figsize=(10,10))
-    corr = df.corr()
-    sns.heatmap(corr, annot=True)
-    plt.show()
+# def show_correlation_matrix(df):
+#     plt.figure(figsize=(10,10))
+#     corr = df.corr()
+#     sns.heatmap(corr, annot=True)
+#     plt.show()
 
 data = dataset.drop(['Release Date','Team','Rating',
                      'Times Listed','Number of Reviews','Reviews','Plays',
                      'Playing','Backlogs','Wishlist'],axis=1)
 
-print(data.columns)
-print(data)
+#print(data.columns)
+#print(data)
+
+#take all differents labels of Genres and put them in a list
+genres = []
+for i in data['Genres']:
+    for j in i.split(', '):
+        for k in j:
+            #keep only characters
+            if not k.isalpha():
+                j = j.replace(k,'')
+        #remove empty elements
+        if j != '':
+            #remove duplicates
+            if j not in genres:
+                genres.append(j)
+
+#print length of genres
+print(len(genres))
+
+
