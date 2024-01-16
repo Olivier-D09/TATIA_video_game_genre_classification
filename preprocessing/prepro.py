@@ -51,11 +51,27 @@ def show_correlation_matrix(df):
 
 
 def normalize_summary(dataset):
+    exclude_list = ["’",".","-","'"," "]
     for i in range(len(dataset)):
         tmp = str(dataset['Summary'][i])
+        #remove title & subchain from summary
+        title = str(dataset['Title'][i])
+
         if dataset['Title'][i] in dataset['Summary'][i]:
-            #remove title from summary
             tmp = tmp.replace(dataset['Title'][i],'The game')
+
+        for x in title:
+            if x.find(":") != -1 or x.isdigit():
+                print(x)
+                splited_title = title.split(x)
+                print(splited_title)
+                for k in range(len(splited_title)):
+                    if splited_title[k] !="" and not splited_title[k].isdigit():
+                        if splited_title[k] in tmp:
+                            tmp = tmp.replace(splited_title[k],'video game ')
+                    if splited_title[k].isdigit() and k == len(splited_title):
+                        return 1
+
         #remove Genres in summary
         gen = g_line(dataset['Genres'][i])
         for j in gen:
@@ -63,6 +79,7 @@ def normalize_summary(dataset):
             tmp = tmp.lower()
             if j in tmp:
                 tmp = tmp.replace(j,'')
+
         dataset['Summary'][i] = tmp
 
 
