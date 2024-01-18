@@ -106,8 +106,9 @@ def flat_text(text):
     
 
 
-def normalize_summary(dataset):
+def normalize(dataset):
     for i in range(len(dataset)):
+
         tmp = str(dataset['Summary'][i])
 
         #remove title & subchain from summary
@@ -126,9 +127,14 @@ def normalize_summary(dataset):
                     if splited_title[k].isdigit() and k == len(splited_title):
                         return 1
 
+        change_genre = []
+        
         #remove Genres in summary
         gen = genre_by_line(dataset['Genres'][i])
         for j in gen:
+            for k in numeroted_genres:
+                if j == k[0]:
+                    change_genre.append(k[1])
             j = str(j).lower()
             tmp = tmp.lower()
             if j in tmp:
@@ -141,18 +147,14 @@ def normalize_summary(dataset):
         for elem in split_correct:
             if elem != '' and elem.find('\n') == -1 and elem.find('\r') == -1:
                 res += elem + ' '     
+            
+
+        data['Genres'][i] = change_genre
+
 
         dataset['Summary'][i] = res
 
 
-def normalize_genre(data):
-    for i in range(len(data)):
-        tmp = []
-        for j in genre_by_line(data['Genres'][i]):
-            for k in numeroted_genres:
-                if j == k[0]:
-                    tmp.append(k[1])
-        data['Genres'][i] = tmp
 
 data = dataset.drop(['Release Date','Team','Rating','Times Listed','Number of Reviews','Reviews','Plays','Playing','Backlogs','Wishlist '],axis=1)
 
@@ -165,10 +167,8 @@ genres, numeroted_genres = get_genres(data['Genres'])
 data['Summary'] = dataset['Summary'].astype(str)
 data['Title'] = dataset['Title'].astype(str)
 
-normalize_summary(data)
-normalize_genre(data)
 
-
+normalize(data)
 
 
 data.to_csv(path + 'games_clean.csv',index=False)
