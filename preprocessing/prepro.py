@@ -54,11 +54,62 @@ def show_correlation_matrix(df):
     plt.show()
 
 
+unerferenced_char = []
+
+def convert_to_ascii(text):
+    res = ""
+    for x in text:
+        if x.isascii():
+            res += x
+        else:
+            if x == 'é' or x == 'è' or x == 'ê':
+                res += 'e'
+            elif x == 'à' or x == 'â':
+                res += 'a'
+            elif x == 'ù' or x == 'û':
+                res += 'u'
+            elif x == 'ô':
+                res += 'o'
+            elif x == 'î' or x == 'ï':
+                res += 'i'
+            elif x == 'ç':
+                res += 'c'
+            else:
+                res += ''
+
+                #save x in a file without encoding
+                with open('non_ascii.txt','a') as file:
+                    file.write(ascii(x) + '\n')
+                
+    return res
+
+
+def flat_text(text):
+    
+    tempo = text.split(' ')
+
+    res = []
+
+    for x in tempo:
+
+        if x.isascii() :
+            if x.find('-') != -1:
+                tempo2 = x.split('-')
+                for y in tempo2:
+                    flat_text(y)
+            else:
+                res.append(x)
+        else:
+            res.append(convert_to_ascii(x))
+
+    return res
+    
+
 
 def normalize_summary(dataset):
-    exclude_list = ["’",".","-","'"," "]
     for i in range(len(dataset)):
         tmp = str(dataset['Summary'][i])
+
         #remove title & subchain from summary
         title = str(dataset['Title'][i])
 
@@ -83,7 +134,15 @@ def normalize_summary(dataset):
             if j in tmp:
                 tmp = tmp.replace(j,'')
 
-        dataset['Summary'][i] = tmp
+        res = '' 
+
+        split_correct = flat_text(tmp)
+
+        for elem in split_correct:
+            if elem != '' and elem.find('\n') == -1 and elem.find('\r') == -1:
+                res += elem + ' '     
+
+        dataset['Summary'][i] = res
 
 
 def normalize_genre(data):
@@ -108,6 +167,8 @@ data['Title'] = dataset['Title'].astype(str)
 
 normalize_summary(data)
 normalize_genre(data)
+
+
 
 
 data.to_csv(path + 'games_clean.csv',index=False)
