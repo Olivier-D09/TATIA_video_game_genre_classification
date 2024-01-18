@@ -128,7 +128,7 @@ def normalize(dataset):
                         return 1
 
         change_genre = []
-        
+
         #remove Genres in summary
         gen = genre_by_line(dataset['Genres'][i])
         for j in gen:
@@ -155,8 +155,8 @@ def normalize(dataset):
         dataset['Summary'][i] = res
 
 
-
 data = dataset.drop(['Release Date','Team','Rating','Times Listed','Number of Reviews','Reviews','Plays','Playing','Backlogs','Wishlist '],axis=1)
+
 
 #print(data.columns)
 #print(data)
@@ -170,6 +170,7 @@ data['Title'] = dataset['Title'].astype(str)
 
 normalize(data)
 
+data = data.drop([649])
 
 data.to_csv(path + 'games_clean.csv',index=False)
 
