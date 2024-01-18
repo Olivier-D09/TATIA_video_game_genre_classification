@@ -23,8 +23,8 @@ data = dataset.drop(['Release Date','Team','Rating',
                      'Times Listed','Number of Reviews','Reviews','Plays',
                      'Playing','Backlogs','Wishlist'],axis=1)
 
-#print(data.columns)
-#print(data)
+# print(data.columns)
+# print(data)
 
 #take all differents labels of Genres and put them in a list
 genres = []
@@ -41,6 +41,8 @@ for i in data['Genres']:
                 genres.append(j)
 
 #print length of genres
-print(len(genres))
+# print(len(genres)) 
+
+data.to_csv(path + "games_clean.csv", index=False)
 
 
