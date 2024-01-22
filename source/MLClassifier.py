@@ -24,20 +24,6 @@ else:
 # data = pd.read_csv(path + "games_clean.csv")
 # result_df = pd.DataFrame(columns=['Title','Genre','Summary'])
 
-# def setGenres(listGenres, Summary,Title,df):
-#     list = listGenres
-#     list = list.replace('[','')
-#     list = list.replace(']','')
-#     for i in list.split(', '):
-#         newLigne = {"Title":Title,"Genre":i,"Summary":Summary}
-#         df = pd.concat([df, pd.DataFrame([newLigne])], ignore_index=True)
-#     return df
-
-# for index, row in data.iterrows():
-#     result_df = setGenres(row['Genres'],row['Summary'],row['Title'],result_df)
-
-# result_df.to_csv(path + "genres_summary.csv", index=False)
-    
 ## Tokenization
     
 newData = pd.read_csv(path + "genres_summary.csv")
