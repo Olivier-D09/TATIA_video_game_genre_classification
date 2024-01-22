@@ -1,18 +1,11 @@
 import pandas as pd
 
-import nltk
-from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords
-
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import classification_report
 
 import platform
-import nltk
-
-# nltk.download('stopwords')
 
 if platform.system() == "Windows":
     path = "preprocessing/"
