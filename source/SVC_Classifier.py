@@ -1,4 +1,5 @@
 import platform
+from matplotlib import pyplot as plt
 from sklearn.svm import SVC
 from sklearn import datasets
 from sklearn.model_selection import GridSearchCV
@@ -37,6 +38,14 @@ clf = SVC(kernel='linear', gamma='auto')
 clf.fit(X_train, y_train)
 y_pred = clf.predict(X_test)
 
+#display graphic of the SVC classifier
+plt.matshow(confusion_matrix(y_test, y_pred))
+
+plt.colorbar()
+plt.xlabel('Predicted Labels')
+plt.ylabel('Summary')
+plt.savefig("images/" + 'SVC_Classifier.png')
+plt.show()
 
 
 print("Accuracy:",metrics.accuracy_score(y_test, y_pred))
