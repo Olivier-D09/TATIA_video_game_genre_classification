@@ -28,18 +28,6 @@ else:
     
 newData = pd.read_csv(path + "genres_summary.csv")
 
-stop_words = set(stopwords.words('english'))
-
-def tokenizeStopWord(text):
-    word_tokens = word_tokenize(text)
-    word_tokens = [word.lower() for word in word_tokens if word.isalpha() and word.lower() not in stop_words]
-    return ' '.join(word_tokens)
-
-
-newData['Tokenized'] = newData['Summary'].apply(tokenizeStopWord)
-newData = newData.dropna()
-newData.to_csv(path + "genres_summary_tokenized.csv", index=False)
-
 vectorizer = TfidfVectorizer()
 X = vectorizer.fit_transform(newData['Tokenized'])
 y = newData['Genre']

@@ -1,16 +1,26 @@
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
 import pandas as pd;
 import matplotlib.pyplot as plt;
 import os;
 import platform;
 import seaborn as sns;
+import nltk;
+
+nltk.download('stopwords')
 
 if platform.system() == "Windows":
     path = "preprocessing/"
 else:
     path = ""
 
+#remove pandas warning
+pd.options.mode.chained_assignment = None
+
+
 #Importing the dataset
-dataset = pd.read_csv(path + "games.csv");
+dataset = pd.read_csv(path + "games.csv")
+stop_words = set(stopwords.words('english'))
 
 #define genres_summary as pandas dataframe
 genres_summary = pd.DataFrame(columns=['Title','Genre','Summary'])
@@ -168,6 +178,12 @@ def one_genre_by_line(data):
                     genres_summary.loc[indice] = [data['Title'][elem], genre, data['Summary'][elem]]
                     indice += 1
 
+def tokenizeStopWord(text):
+    word_tokens = word_tokenize(text)
+    word_tokens = [word.lower() for word in word_tokens if word.isalpha() and word.lower() not in stop_words]
+    return ' '.join(word_tokens)
+
+
 data = dataset.drop(['Release Date','Team','Rating','Times Listed','Number of Reviews','Reviews','Plays','Playing','Backlogs','Wishlist '],axis=1)
 
 
@@ -190,3 +206,8 @@ one_genre_by_line(data)
 data.to_csv(path + 'games_clean.csv',index=False)
 
 genres_summary.to_csv(path + "genres_summary.csv", index=False)
+
+
+genres_summary['Tokenized'] = genres_summary['Summary'].apply(tokenizeStopWord)
+newData = genres_summary.dropna()
+newData.to_csv(path + "genres_summary_tokenized.csv", index=False)
