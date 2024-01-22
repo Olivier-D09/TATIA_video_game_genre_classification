@@ -12,6 +12,10 @@ else:
 #Importing the dataset
 dataset = pd.read_csv(path + "games.csv");
 
+#define genres_summary as pandas dataframe
+genres_summary = pd.DataFrame(columns=['Title','Genre','Summary'])
+
+
 def get_genres(line):
     acc1 = []
     acc2 = []
@@ -154,6 +158,15 @@ def normalize(dataset):
 
         dataset['Summary'][i] = res
 
+def one_genre_by_line(data):
+    indice = 0
+    for elem in range(len(data)+4):
+        if elem not in [649,713,1309,1475]:
+            listeofgenres = data['Genres'][elem]
+            if len(listeofgenres) >= 1:
+                for genre in listeofgenres:
+                    genres_summary.loc[indice] = [data['Title'][elem], genre, data['Summary'][elem]]
+                    indice += 1
 
 data = dataset.drop(['Release Date','Team','Rating','Times Listed','Number of Reviews','Reviews','Plays','Playing','Backlogs','Wishlist '],axis=1)
 
@@ -170,7 +183,10 @@ data['Title'] = dataset['Title'].astype(str)
 
 normalize(data)
 
-data = data.drop([649])
+data = data.drop([649,713,1309,1475])
+
+one_genre_by_line(data)
 
 data.to_csv(path + 'games_clean.csv',index=False)
 
+genres_summary.to_csv(path + "genres_summary.csv", index=False)
