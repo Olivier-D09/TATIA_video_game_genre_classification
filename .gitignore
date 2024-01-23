@@ -2,4 +2,5 @@ preprocessing/games_clean.csv
 non_ascii.txt
 preprocessing/genres_summary_tokenized.csv
 preprocessing/genres_summary.csv
+preprocessing/oneHotencode.csv
 images/
