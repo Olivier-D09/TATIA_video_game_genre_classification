@@ -1,3 +1,4 @@
+########################################################Imports###############################################
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 import pandas as pd;
@@ -9,23 +10,24 @@ import nltk;
 
 nltk.download('stopwords')
 
-if platform.system() == "Windows":
-    path = "preprocessing/"
-else:
-    path = ""
+########################################################Functions###############################################
 
-#remove pandas warning
-pd.options.mode.chained_assignment = None
+#define path for import & export files
+def get_path():
+    if platform.system() == "Windows":
+        path = "preprocessing/"
+    else:
+        path = ""
+    return path
 
+#Show corroleation matrix
+def show_correlation_matrix(df):
+    plt.figure(figsize=(10,10))
+    corr = df.corr()
+    sns.heatmap(corr, annot=True)
+    plt.show()
 
-#Importing the dataset
-dataset = pd.read_csv(path + "games.csv")
-stop_words = set(stopwords.words('english'))
-
-#define genres_summary as pandas dataframe
-genres_summary = pd.DataFrame(columns=['Title','Genre','Summary'])
-
-
+#give a list of all gernres and a list of all genres with a number
 def get_genres(line):
     acc1 = []
     acc2 = []
@@ -46,7 +48,9 @@ def get_genres(line):
                     count += 1
     return acc1,acc2
 
-def genre_by_line(line):
+
+#return a list of genres for a row on dataframe
+def genre_by_row(line):
     acc = []
     for j in line.split(', '):
             for k in j:
@@ -60,16 +64,8 @@ def genre_by_line(line):
                     acc.append(j)
     return acc
 
-#Show corroleation matrix
-def show_correlation_matrix(df):
-    plt.figure(figsize=(10,10))
-    corr = df.corr()
-    sns.heatmap(corr, annot=True)
-    plt.show()
 
-
-unerferenced_char = []
-
+#convert non ascii character to ascii
 def convert_to_ascii(text):
     res = ""
     for x in text:
@@ -89,23 +85,16 @@ def convert_to_ascii(text):
             elif x == 'ç':
                 res += 'c'
             else:
-                res += ''
-
-                #save x in a file without encoding
-                with open('non_ascii.txt','a') as file:
-                    file.write(ascii(x) + '\n')
-                
+                res += ''                
     return res
 
-
+#remove recursively - from text 
 def flat_text(text):
     
     tempo = text.split(' ')
-
     res = []
 
     for x in tempo:
-
         if x.isascii() :
             if x.find('-') != -1:
                 tempo2 = x.split('-')
@@ -115,23 +104,41 @@ def flat_text(text):
                 res.append(x)
         else:
             res.append(convert_to_ascii(x))
-
     return res
     
+#remove recursively genre from summary
+def delete_genre(resume,genre):
+    if genre in resume:
+        resume = resume.replace(genre,'')
+        if genre in resume:
+            delete_genre(resume,genre)
+    return resume
 
+#remove tabulation, new line and empty element from summary
+def remove_format(tmp):
+    split_correct = flat_text(tmp)
+    res = ' '
+    for elem in split_correct:
+        if elem != '' and elem.find('\n') == -1 and elem.find('\r') == -1:
+            res += elem + ' '
+    return res
 
-def normalize(dataset):
-    for i in range(len(dataset)):
+#remove & translate Genres in summary
+def remove_genres(numeroted_genres,tmp,i):
+    change_genre = []
+    gen = genre_by_row(dataset['Genres'][i])
+    for j in gen:
+        for k in numeroted_genres:
+            if j == k[0]:
+                change_genre.append(k[1])
+        j = str(j).lower()
+        tmp = tmp.lower()
+        tmp = delete_genre(tmp,j)
+    return change_genre,tmp
 
-        tmp = str(dataset['Summary'][i])
-
-        #remove title & subchain from summary
-        title = str(dataset['Title'][i])
-
-        if dataset['Title'][i] in dataset['Summary'][i]:
-            tmp = tmp.replace(dataset['Title'][i],'The game')
-
-        for x in title:
+#remove subchain of title from summary
+def subchain_remove(title,tmp):
+    for x in title:
             if x.find(":") != -1 or x.isdigit():
                 splited_title = title.split(x)
                 for k in range(len(splited_title)):
@@ -141,34 +148,27 @@ def normalize(dataset):
                     if splited_title[k].isdigit() and k == len(splited_title):
                         return 1
 
-        change_genre = []
 
-        #remove Genres in summary
-        gen = genre_by_line(dataset['Genres'][i])
-        for j in gen:
-            for k in numeroted_genres:
-                if j == k[0]:
-                    change_genre.append(k[1])
-            j = str(j).lower()
-            tmp = tmp.lower()
-            if j in tmp:
-                tmp = tmp.replace(j,'')
+#work on the dataset to remove title, tabulation...  & genre from summary
+def normalize(dataset):
+    for i in range(len(dataset)):
 
-        res = '' 
+        tmp = str(dataset['Summary'][i])
+        title = str(dataset['Title'][i])
 
-        split_correct = flat_text(tmp)
+        #remove title & subchain from summary
+        if dataset['Title'][i] in dataset['Summary'][i]:
+            tmp = tmp.replace(dataset['Title'][i],'The game')
+        subchain_remove(title,tmp)
+        
+        translated_genres,tmp =  remove_genres(numeroted_genres,tmp,i)
+        tmp = remove_format(tmp)
 
-        for elem in split_correct:
-            if elem != '' and elem.find('\n') == -1 and elem.find('\r') == -1:
-                res += elem + ' '     
-            
+        data['Genres'][i] = translated_genres
+        dataset['Summary'][i] = tmp
 
-        data['Genres'][i] = change_genre
-
-
-        dataset['Summary'][i] = res
-
-def one_genre_by_line(data):
+#build new dataframe with one genre by row of the dataframe
+def one_genre_by_row(data):
     indice = 0
     for elem in range(len(data)+4):
         if elem not in [649,713,1309,1475]:
@@ -184,30 +184,36 @@ def tokenizeStopWord(text):
     return ' '.join(word_tokens)
 
 
+########################################################Code###############################################
+
+#remove pandas warning
+pd.options.mode.chained_assignment = None
+
+path = get_path()
+
+#Importing the datasets
+dataset = pd.read_csv(path + "games.csv")
+stop_words = set(stopwords.words('english'))
+
+genres_summary = pd.DataFrame(columns=['Title','Genre','Summary']) #define genres_summary as pandas dataframe
+
+#drop useless columns
 data = dataset.drop(['Release Date','Team','Rating','Times Listed','Number of Reviews','Reviews','Plays','Playing','Backlogs','Wishlist '],axis=1)
 
+genres, numeroted_genres = get_genres(data['Genres']) #list of genres & list of genres with a number
 
-#print(data.columns)
-#print(data)
-
-genres, numeroted_genres = get_genres(data['Genres'])
-
-
+#set type of columns to string
 data['Summary'] = dataset['Summary'].astype(str)
 data['Title'] = dataset['Title'].astype(str)
 
-
 normalize(data)
+data = data.drop([649,713,1309,1475]) #remove rows with empty summary or genre
+one_genre_by_row(data)
+data.to_csv(path + 'games_clean.csv',index=False) #dataframe with clean summary 
 
-data = data.drop([649,713,1309,1475])
-
-one_genre_by_line(data)
-
-data.to_csv(path + 'games_clean.csv',index=False)
-
-genres_summary.to_csv(path + "genres_summary.csv", index=False)
-
+genres_summary.to_csv(path + "genres_summary.csv", index=False)#dataframe with one genre by row
 
 genres_summary['Tokenized'] = genres_summary['Summary'].apply(tokenizeStopWord)
 newData = genres_summary.dropna()
-newData.to_csv(path + "genres_summary_tokenized.csv", index=False)
+
+newData.to_csv(path + "genres_summary_tokenized.csv", index=False) #dataframe with one genre by row & tokenized summary
