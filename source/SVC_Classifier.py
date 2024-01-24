@@ -44,7 +44,6 @@ plt.matshow(confusion_matrix(y_test, y_pred))
 plt.colorbar()
 plt.xlabel('Predicted Labels')
 plt.ylabel('Summary')
-plt.savefig("images/" + 'SVC_Classifier.png')
 plt.show()
 
 

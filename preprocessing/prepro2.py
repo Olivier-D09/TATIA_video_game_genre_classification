@@ -77,3 +77,19 @@ print(classification_report(y_train, y_train_pred))
 
 print("Test :")
 print(classification_report(y_test, y_test_pred))
+
+
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+def plot_confusion_matrix(y_true, y_pred, classes, title):
+    cm = confusion_matrix(y_true, y_pred, labels=classes)
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=classes, yticklabels=classes)
+    plt.title(title)
+    plt.xlabel("Predicted")
+    plt.ylabel("True")
+    plt.show()
+
+plot_confusion_matrix(y_test, y_test_pred, classes=svm.classes_, title="Confusion Matrix with lemming")
