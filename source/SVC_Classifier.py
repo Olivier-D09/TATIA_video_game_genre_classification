@@ -1,5 +1,7 @@
 import platform
+import seaborn as sns
 from matplotlib import pyplot as plt
+from sklearn.exceptions import UndefinedMetricWarning
 from sklearn.svm import SVC
 from sklearn import datasets
 from sklearn.model_selection import GridSearchCV
@@ -14,6 +16,12 @@ from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import cross_val_score
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
+import warnings
+
+warnings.filterwarnings("ignore", category=FutureWarning)
+warnings.filterwarnings("ignore", category=UndefinedMetricWarning)
+
+
 
 if platform.system() == "Windows":
     path = "preprocessing/"
@@ -50,4 +58,3 @@ plt.show()
 print("Accuracy:",metrics.accuracy_score(y_test, y_pred))
 print("Precision:",metrics.precision_score(y_test, y_pred, average='macro'))
 print("Recall:",metrics.recall_score(y_test, y_pred, average='macro'))
-
