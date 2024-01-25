@@ -43,7 +43,7 @@ def get_genres(line):
                 #remove duplicates
                 if j not in acc1:
                     acc1.append(j)
-                    temp = [j,count]
+                    temp = [j,count,0]
                     acc2.append(temp)
                     count += 1
     return acc1,acc2
@@ -183,6 +183,27 @@ def tokenizeStopWord(text):
     word_tokens = [word.lower() for word in word_tokens if word.isalpha() and word.lower() not in stop_words]
     return ' '.join(word_tokens)
 
+def keep_min_occur(tableOfGenre,genres):
+    min = 100000
+    for genre in genres:
+        if tableOfGenre[genre-1][2] < min:
+            min = tableOfGenre[genre-1][2]
+            keep = genre
+    tableOfGenre[keep-1][2] += 1
+    return tableOfGenre,keep
+
+def choice_genre(tableOfGenre,dataset):
+    for i in range(len(dataset)):
+        if i not in [649,713,1309,1475]:
+            genres = dataset['Genres'][i] 
+            if len(genres) == 1:
+                genres = int(genres[0])
+                temp = tableOfGenre[genres-1]
+                temp[2] += 1
+            else:
+                tableOfGenre,res =keep_min_occur(tableOfGenre,genres)
+                dataset['Genres'][i] = res
+    return tableOfGenre
 
 ########################################################Code###############################################
 
@@ -208,6 +229,8 @@ data['Title'] = dataset['Title'].astype(str)
 
 normalize(data)
 data = data.drop([649,713,1309,1475]) #remove rows with empty summary or genre
+neoData = data.copy() #copy of data
+numeroted_genres = choice_genre(numeroted_genres,neoData) #select genre for each row
 one_genre_by_row(data)
 data.to_csv(path + 'games_clean.csv',index=False) #dataframe with clean summary 
 
@@ -217,3 +240,6 @@ genres_summary['Tokenized'] = genres_summary['Summary'].apply(tokenizeStopWord)
 newData = genres_summary.dropna()
 
 newData.to_csv(path + "genres_summary_tokenized.csv", index=False) #dataframe with one genre by row & tokenized summary
+
+neoData.to_csv(path + "games_V2.csv", index=False) #dataframe with one genre by row
+print(numeroted_genres)

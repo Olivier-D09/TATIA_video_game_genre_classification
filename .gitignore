@@ -1,4 +1,5 @@
 preprocessing/games_clean.csv
+preprocessing/games_V2.csv
 non_ascii.txt
 preprocessing/genres_summary_tokenized.csv
 preprocessing/genres_summary.csv
