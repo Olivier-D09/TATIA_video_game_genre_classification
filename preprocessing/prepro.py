@@ -7,6 +7,8 @@ import os;
 import platform;
 import seaborn as sns;
 import nltk;
+from sklearn.preprocessing import LabelBinarizer
+
 
 nltk.download('stopwords')
 
@@ -242,4 +244,15 @@ newData = genres_summary.dropna()
 newData.to_csv(path + "genres_summary_tokenized.csv", index=False) #dataframe with one genre by row & tokenized summary
 
 neoData.to_csv(path + "games_V2.csv", index=False) #dataframe with one genre by row
-print(numeroted_genres)
+
+neoData2 = neoData.copy()
+
+lb = LabelBinarizer()
+labels = neoData2['Genres'] #labels
+binarized_labels = lb.fit_transform(labels)
+
+df = pd.DataFrame(columns=['OneHot'])
+df['OneHot'] = binarized_labels.tolist()
+
+neoData2 = neoData2.join(df)
+neoData2.to_csv(path + "oneHotencode.csv", index=False)
