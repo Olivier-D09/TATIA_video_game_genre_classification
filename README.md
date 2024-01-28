@@ -10,5 +10,6 @@ un dossier source qui contiens les différents models que nous avons uttilisés.
 ---
 
 pour lancer le code,  
-il faut exécuter le fichier preprocessing/prepro.py qui vas générer les datasets uttilisés dans le projet.  
+il faut exécuter le fichier preprocessing/prepro.py qui vas générer les datasets utilisés dans le projet.  
 Ensuite chaque fichier du dossier source est indépendant des autres et permet de générer les résultats des différents models uttilisés.
+Pour les résultats du SVC avec lemming, il faut lancer prepro2.py dans preprocessing.
